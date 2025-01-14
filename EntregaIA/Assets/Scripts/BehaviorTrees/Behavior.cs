@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,39 @@ namespace BehaviorTrees
     public interface IBehavior
     {
         NodeState Evaluate();
-        void Reset();
+        void Reset() { }
     }
 
+    public class ActionBehavior : IBehavior
+    {
+        public Action action; 
+
+        public ActionBehavior(Action action)
+        {
+            this.action = action;
+        }
+
+        public NodeState Evaluate() 
+        {
+            action();
+            return NodeState.SUCCESS;
+        }
+    }
+
+    public class Condition : IBehavior
+    {
+        public Func<bool> condition;
+
+        public Condition(Func<bool> condition)
+        {
+            this.condition = condition;
+        }
+
+        public NodeState Evaluate()
+        {
+            return condition() ? NodeState.SUCCESS : NodeState.FAILURE;
+        }
+    }
     public class Patrol : IBehavior
     {
         public Transform entity; 
