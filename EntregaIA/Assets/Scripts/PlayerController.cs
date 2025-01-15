@@ -47,7 +47,12 @@ public class PlayerController : MonoBehaviour
         moveToTreasure.AddChild(takeTreasure);
 
         beforeTreasure.AddChild(moveToTreasure);
-        //Leaf setActive = new Leaf("SetActive", new ActionBehavior(() => target.SetActive(false)));
+        Leaf setActive = new Leaf("SetActive", new ActionBehavior(() => target.SetActive(false)));
+        playerActions.AddChild(setActive);
+
+        Sequence objectStolen = new Sequence("Object Stolen");
+        objectStolen.AddChild(new Leaf("Go to Goal", new MoveToTarget(this.transform, agent, goal.transform)));
+        playerActions.AddChild(objectStolen);
 
         tree.AddChild(playerActions);
     }
