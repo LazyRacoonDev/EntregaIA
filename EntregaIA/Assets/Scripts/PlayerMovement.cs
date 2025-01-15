@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Configuración de Movimiento")]
-    [SerializeField] private float speed = 5f; // Velocidad normal
+    [SerializeField] private float speed = 20f; // Velocidad normal
     [SerializeField] private float slowSpeed = 2f; // Velocidad lenta (cuando se presiona Control)
     [SerializeField] private bool useSmoothMovement = true; // Movimiento suave
     [SerializeField] private float smoothTime = 0.1f; // Tiempo de suavizado
