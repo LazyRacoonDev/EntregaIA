@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
+
 
 namespace BehaviorTrees
 {
@@ -88,8 +90,92 @@ namespace BehaviorTrees
             currentWaypoint = 0;
         }
     }
+    public class Wander : IBehavior
+    {
+        public NavMeshAgent agent;
+        public float wanderRadius;
+        public float wanderTimer;
+
+        private float timer;
+
+        public Wander(NavMeshAgent agent, float wanderRadius, float wanderTimer)
+        {
+            this.agent = agent;
+            this.wanderRadius = wanderRadius;
+            this.wanderTimer = wanderTimer;
+            timer = wanderTimer;
+        }
+
+        public NodeState Evaluate()
+        {
+            timer += Time.deltaTime;
+            if (timer >= wanderTimer)
+            {
+                Vector3 randDirection = Random.insideUnitSphere * wanderRadius;
+                randDirection += agent.transform.position;
+                NavMeshHit hit;
+                NavMesh.SamplePosition(randDirection, out hit, wanderRadius, -1);
+                Vector3 newPos = hit.position;
+                agent.SetDestination(newPos);
+                timer = 0;
+            }
+
+            if (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
+            {
+                return NodeState.RUNNING;
+            }
+
+            return NodeState.SUCCESS;
+        }
+    }
 
     public class MoveToTarget : IBehavior
+    {
+        public Transform entity;
+        public NavMeshAgent agent;
+        public Transform target;
+        public bool isPathSet;
+
+        public MoveToTarget(Transform entity, NavMeshAgent agent, Transform target)
+        {
+            this.entity = entity;
+            this.agent = agent;
+            this.target = target;
+        }
+
+        public NodeState Evaluate()
+        {
+            if (target == null)
+            {
+                return NodeState.FAILURE;
+            }
+
+            if (Vector3.Distance(entity.position, target.position) < 1.0f)
+            {
+                Debug.Log("Target reached");
+                return NodeState.SUCCESS;
+            }
+
+            agent.SetDestination(target.position);
+            entity.LookAt(target.position);
+
+            if (agent.pathPending)
+            {
+                isPathSet = true;
+            }
+
+            if (!isPathSet)
+            {
+                return NodeState.FAILURE;
+            }
+
+            return NodeState.RUNNING;
+        }
+
+        public void Reset() => isPathSet = false;
+    }
+    
+    public class MoveToTargetInRange : IBehavior
     {
         public Transform entity;
         public NavMeshAgent agent;
@@ -97,7 +183,7 @@ namespace BehaviorTrees
         public float range; 
         public bool isPathSet;
 
-        public MoveToTarget(Transform entity, NavMeshAgent agent, Transform target, float range)
+        public MoveToTargetInRange(Transform entity, NavMeshAgent agent, Transform target, float range)
         {
             this.entity = entity;
             this.agent = agent;
@@ -136,4 +222,49 @@ namespace BehaviorTrees
 
         public void Reset() => isPathSet = false;
     }
+
+    public class RunAway : IBehavior
+    {
+        private NavMeshAgent agent; 
+        private float escapeRange;
+        private LayerMask enemyLayer;
+
+        public RunAway(NavMeshAgent agent, float escapeRange, LayerMask enemyLayer)
+        {
+            this.agent = agent;
+            this.escapeRange = escapeRange;
+            this.enemyLayer = enemyLayer;
+        }
+
+        public NodeState Evaluate()
+        {
+            
+            Collider[] enemies = Physics.OverlapSphere(agent.transform.position, escapeRange, enemyLayer);
+
+            if (enemies.Length == 0)
+            {
+                return NodeState.SUCCESS;
+            }
+
+            Vector3 escapeDirection = Vector3.zero;
+
+            foreach (Collider enemy in enemies)
+            {
+                escapeDirection += (agent.transform.position - enemy.transform.position).normalized;
+            }
+
+            escapeDirection = escapeDirection.normalized;
+
+            Vector3 escapePosition = agent.transform.position + escapeDirection * escapeRange;
+
+            if (NavMesh.SamplePosition(escapePosition, out NavMeshHit hit, escapeRange, NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+                return NodeState.RUNNING;
+            }
+
+            return NodeState.FAILURE;
+        }
+    }
+
 }

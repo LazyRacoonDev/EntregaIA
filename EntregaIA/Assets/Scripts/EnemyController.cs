@@ -26,7 +26,7 @@ public class EnemyController : MonoBehaviour
         Sequence chase = new Sequence("Chase", 100);
         
         chase.AddChild(new Leaf("IsPlayerNear?", new Condition(() => IsOnRange(chase))));
-        chase.AddChild(new Leaf("ChasePlayer", new MoveToTarget(transform, agent, target.transform, range)));
+        chase.AddChild(new Leaf("ChasePlayer", new MoveToTargetInRange(transform, agent, target.transform, range)));
 
         actions.AddChild(chase);
 

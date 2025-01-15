@@ -176,6 +176,7 @@ namespace BehaviorTrees
                 {
                     case NodeState.SUCCESS:
                         allSuccess = allSuccess && true;
+                        
                         break;
                     case NodeState.RUNNING:
                         anyRunning = true;
