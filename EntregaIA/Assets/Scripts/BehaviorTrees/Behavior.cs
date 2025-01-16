@@ -223,6 +223,72 @@ namespace BehaviorTrees
         public void Reset() => isPathSet = false;
     }
 
+    public class Hide : IBehavior
+    {
+        private Transform player;
+        private NavMeshAgent agent;
+        private GameObject[] hidingSpots;
+        private LayerMask enemies;
+
+        public Hide(Transform player, NavMeshAgent agent, GameObject[] hidingSpots, LayerMask enemies)
+        {
+            this.player = player;
+            this.agent = agent;
+            this.hidingSpots = hidingSpots;
+            this.enemies = enemies;
+        }
+
+        public NodeState Evaluate()
+        {
+            Collider[] enemiesInRange = Physics.OverlapSphere(player.position, 30f, enemies);
+
+            if (enemiesInRange.Length == 0 || hidingSpots.Length == 0)
+            {
+                return NodeState.FAILURE;
+            }
+
+            float dist = Mathf.Infinity;
+            Vector3 chosenSpot = Vector3.zero;
+            Vector3 chosenDir = Vector3.zero;
+            GameObject chosenGO = hidingSpots[0];
+
+            foreach (Collider enemy in enemiesInRange)
+            {
+                foreach (GameObject spot in hidingSpots)
+                {
+                    Vector3 hideDir = spot.transform.position - enemy.transform.position;
+                    Vector3 hidePos = spot.transform.position + hideDir.normalized * 100;
+
+                    if (Vector3.Distance(player.position, hidePos) < dist)
+                    {
+                        chosenSpot = hidePos;
+                        chosenDir = hideDir;
+                        chosenGO = spot;
+                        dist = Vector3.Distance(player.position, hidePos);
+                    }
+                }
+            }
+
+            Collider hideCol = chosenGO.GetComponent<Collider>();
+            if (hideCol != null)
+            {
+                Ray backRay = new Ray(chosenSpot, -chosenDir.normalized);
+                RaycastHit info;
+                float distance = 250.0f;
+
+                if (hideCol.Raycast(backRay, out info, distance))
+                {
+                    Vector3 hideValue = info.point + chosenDir.normalized;
+                    agent.SetDestination(hideValue);
+                    return NodeState.RUNNING;
+                }
+            }
+
+            return NodeState.FAILURE;
+        }
+
+    }
+
     public class RunAway : IBehavior
     {
         private NavMeshAgent agent; 

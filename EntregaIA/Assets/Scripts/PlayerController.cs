@@ -14,7 +14,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public float wanderTimer;
     [SerializeField] public GameObject goal;
     [SerializeField] public GameObject cop;
+    [SerializeField] public GameObject[] hidingSpots;
     [SerializeField] public float speed;
+    [SerializeField] public LayerMask enemyLayer; 
 
     public NavMeshAgent agent;
     public Tree tree;
@@ -50,9 +52,12 @@ public class PlayerController : MonoBehaviour
         Leaf setActive = new Leaf("SetActive", new ActionBehavior(() => target.SetActive(false)));
         playerActions.AddChild(setActive);
 
-        Sequence objectStolen = new Sequence("Object Stolen");
+        PrioritySelector objectStolen = new PrioritySelector("Object Stolen");
+        objectStolen.AddChild(new Leaf("Hide", new Hide(this.transform, agent, hidingSpots, enemyLayer),100));
         objectStolen.AddChild(new Leaf("Go to Goal", new MoveToTarget(this.transform, agent, goal.transform)));
         playerActions.AddChild(objectStolen);
+
+
 
         tree.AddChild(playerActions);
     }
