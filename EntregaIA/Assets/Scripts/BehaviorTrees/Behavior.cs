@@ -240,7 +240,7 @@ namespace BehaviorTrees
 
         public NodeState Evaluate()
         {
-            Collider[] enemiesInRange = Physics.OverlapSphere(player.position, 30f, enemies);
+            Collider[] enemiesInRange = Physics.OverlapSphere(player.position, 15f, enemies);
 
             if (enemiesInRange.Length == 0 || hidingSpots.Length == 0)
             {

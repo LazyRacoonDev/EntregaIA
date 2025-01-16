@@ -2383,6 +2383,9 @@ MonoBehaviour:
   cop: {fileID: 0}
   hidingSpots:
   - {fileID: 1964150548}
+  - {fileID: 1860486536}
+  - {fileID: 1654377464}
+  - {fileID: 1225320159}
   speed: 5
   enemyLayer:
     serializedVersion: 2
@@ -4793,7 +4796,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2810827723386994177, guid: 344e5bc5b26a34542848678562e23c45, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -21.5
+      value: -53.3
       objectReference: {fileID: 0}
     - target: {fileID: 2810827723386994177, guid: 344e5bc5b26a34542848678562e23c45, type: 3}
       propertyPath: m_LocalRotation.w
@@ -19274,6 +19277,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.8853211, y: 2.9989538, z: 0.5547941}
   m_Center: {x: 0.10510969, y: 0.9994762, z: -0.05063954}
+--- !u!1 &1654377464 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7591319092751514162, guid: b77b2a7a0540f1a46bded680efc7e603, type: 3}
+  m_PrefabInstance: {fileID: 1516334077}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1654377465 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7066738055900061832, guid: b77b2a7a0540f1a46bded680efc7e603, type: 3}

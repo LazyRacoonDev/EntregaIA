@@ -65,8 +65,19 @@ public class PlayerController : MonoBehaviour
     
     void Update()
     {
-        animator.SetFloat("Speed", agent.velocity.magnitude);
+        
         tree.Evaluate();
+        Collider[] enemiesInRange = Physics.OverlapSphere(transform.position, 20f, enemyLayer);
+        if (enemiesInRange.Length > 0)
+        {
+            agent.speed = 8;
+        }
+        else
+        {
+            agent.speed = 3.5f;
+        }
+
+        animator.SetFloat("Speed", agent.velocity.magnitude);
     }
 
     private bool IsOnRange()
