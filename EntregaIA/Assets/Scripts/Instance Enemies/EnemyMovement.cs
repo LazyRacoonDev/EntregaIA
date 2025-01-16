@@ -29,6 +29,28 @@ public class EnemyMovement : MonoBehaviour
     void Update()
     {
         animator.SetFloat("Speed", agent.velocity.magnitude);
+
+        Collider[] colliders = Physics.OverlapSphere(transform.position, frustum.farClipPlane, mask);
+        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(frustum);
+
+        foreach (Collider col in colliders)
+        {
+            RaycastHit hit;
+            Ray ray = new Ray(transform.position, (col.transform.position - transform.position).normalized);
+            ray.origin = ray.GetPoint(frustum.nearClipPlane);
+
+            if (Physics.Raycast(ray, out hit, frustum.farClipPlane, mask))
+            {
+                if (hit.collider.gameObject.CompareTag("Target"))
+                {
+                    EnemyManager.myManager.enemyState = state.CHASE;
+                }
+            }
+            else
+            {
+                EnemyManager.myManager.enemyState = state.WANDER;
+            }
+        }
     }
 
     void chase()
