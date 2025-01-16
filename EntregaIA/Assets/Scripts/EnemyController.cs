@@ -13,12 +13,13 @@ public class EnemyController : MonoBehaviour
 
     public NavMeshAgent agent;
     public Tree tree; 
-
+    public Animator animator;
 
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
         tree = new Tree("Enemy");
 
         PrioritySelector actions = new PrioritySelector("Agent Logic");
@@ -40,6 +41,7 @@ public class EnemyController : MonoBehaviour
     
     void Update()
     {
+        animator.SetFloat("Speed", agent.velocity.magnitude);
         tree.Evaluate();
     }
 
